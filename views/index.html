@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>mad tweets</title>
+
+	<style type="text/css">
+	.result > div {display: inline-block;}
+	</style>
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+
+
+	<script>window.twttr = (function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0],
+	    t = window.twttr || {};
+	  if (d.getElementById(id)) return t;
+	  js = d.createElement(s);
+	  js.id = id;
+	  js.src = "https://platform.twitter.com/widgets.js";
+	  fjs.parentNode.insertBefore(js, fjs);
+	 
+	  t._e = [];
+	  t.ready = function(f) {
+	    t._e.push(f);
+	  };
+	 
+	  return t;
+	}(document, "script", "twitter-wjs"));</script>
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var tweets = []
+				,startingpoint = 0;
+
+			twttr.ready(function(twttr){
+				$.get( "/tweets/stored", function( data ) {
+					tweets = data;
+					showOnehundred();
+				});
+			})
+
+			var showOnehundred = _.throttle(function(){
+				for (i = startingpoint; i < startingpoint+50; i++){
+					var newDivContainer = $('<div/>').text("term: "+tweets[i].search_term).appendTo('.result');
+					var tweetdiv = $('<div/>').appendTo(newDivContainer)
+					twttr.widgets.createTweet(
+					  tweets[i].id_str,
+					  tweetdiv[0]
+					);
+				}
+				startingpoint+=50
+				console.log('go!!!' + startingpoint);
+			}, 2000)
+
+			// var scrollything = _.debounce
+
+			$(window).scroll(_.throttle(function() {
+			   if($(window).scrollTop() + $(window).height() > $(document).height() - 300) {
+			  	console.log('wtf');
+			       showOnehundred();
+			   }
+			}, 100));
+			
+		})
+
+	</script>
+
+</head>
+<body>
+
+	<div class="result"></div>
+
+</body>
+</html>

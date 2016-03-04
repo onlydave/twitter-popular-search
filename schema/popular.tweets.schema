@@ -1,0 +1,14 @@
+var mongoose = require("mongoose"),
+    PopularTweets = new mongoose.Schema({
+      _id     :  String,
+      id_str     :  String,
+      created_at :  String,
+      date :  Date,
+      text  : String,
+      user_id : Number,
+      user_name : String,
+      search_term : String
+
+    }, { collection :  "popular_tweets" });
+
+exports.PopularTweets = PopularTweets;

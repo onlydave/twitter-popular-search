@@ -1,6 +1,7 @@
 var Twitter 	= require('twitter')
    	,_	    	= require('underscore')
 	 	,express	=	require('express')
+    ,bodyParser = require('body-parser')
 		,app			=	express()
     ,mongoose = require("mongoose")
     ,PopularTweetsSchema = require('./schema/popular.tweets.schema').PopularTweets
@@ -12,6 +13,13 @@ var Twitter 	= require('twitter')
     , counttwitterrequests = 0
     , counttweets = 0;
  
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+app.use(bodyParser.json())
+
 
 var connect = function(){
   mongoose.connect('mongodb://localhost/populartweets/');
@@ -42,12 +50,19 @@ var storeTweets = function(teamname){
   console.log('total tweets: '+counttweets)
 }
 
-var client = new Twitter({
+var twitter_cridentials = {
   consumer_key: '<insert key here>',
   consumer_secret: '<insert key here>',
   access_token_key: '', //these keys aren't needed for read
   access_token_secret: '' //these keys arent needed for read 
-});
+}
+
+if (twitter_cridentials.consumer_key == '<insert key here>'){
+  console.log('ERROR:: You need to add your twitter key and secret from https://apps.twitter.com');
+  process.exit();
+}
+
+var client = new Twitter();
 
 app.use(express.static('views'));
 
@@ -107,6 +122,11 @@ client.get('search/tweets', params, setTweets);
 
 app.get('/tweets/premierleague', function(req, res) {
   res.send(tweets_holder);
+})
+app.post('/sendtoken', function(req, res) {
+  console.log('hi');
+  console.log(req.body);
+  res.end();
 })
 app.get('/tweets/stored', function(req, res) {
   var s = ptModel.find({})
